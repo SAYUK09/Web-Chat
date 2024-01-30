@@ -1,11 +1,16 @@
 import React from "react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
+import { useAuth } from "../contexts/authContext";
 
-export default function Login() {
-  function signin() {
+export default function loginWithGoogle() {
+  const { user } = useAuth();
+  console.log(user);
+
+  console.log(auth);
+  function loginWithGoogle() {
     const googleProvider = new GoogleAuthProvider();
-    console.log("enter");
+
     signInWithPopup(auth, googleProvider)
       .then(({ user: { displayName, email, photoURL, uid } }) => {
         console.log({ displayName, email, photoURL, uid });
@@ -16,5 +21,5 @@ export default function Login() {
       });
   }
 
-  return <div onClick={signin}>Login</div>;
+  return <div onClick={loginWithGoogle}>Login</div>;
 }
