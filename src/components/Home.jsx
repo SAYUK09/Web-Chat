@@ -38,15 +38,14 @@ export default function Home() {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    socket.connect();
-
-    socket.on("messageReceived", ({ roomId, message, sender }) => {
-      console.log(message, "rec", roomId);
+    function onMessageReceived({ roomId, message, sender }) {
       setChatRoomMessages((msg) => [...msg, { roomId, message, sender }]);
-    });
+    }
+
+    socket.on("messageReceived", onMessageReceived);
 
     return () => {
-      socket.disconnect();
+      socket.off("messageReceived");
     };
   }, [socket]);
 
