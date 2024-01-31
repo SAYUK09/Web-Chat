@@ -6,7 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({
     name: "",
     email: "",
-    photo: "",
+    photoURL: "",
     uid: "",
     _id: "",
   });
