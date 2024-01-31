@@ -3,39 +3,32 @@ import { socket } from "../socket/socket";
 import { useAuth } from "../contexts/authContext";
 
 export default function Home() {
-  const rooms = [
-    {
-      id: 1,
-      title: "Tech",
-      about: "Share Tech Thnings",
-      messages: [{ id: 1, sender: "Elon", message: "I am alien" }],
-    },
-    {
-      id: 2,
-      title: "Memes",
-      about: "Only Memes & Jokes",
-      messages: [{ id: 2, sender: "Gabbar", message: "hahaha" }],
-    },
-    {
-      id: 3,
-      title: "Cricket",
-      about: "RCB will win IPL this year",
-      messages: [
-        {
-          id: 2,
-          sender: "Gambhir",
-          message: "Dhoni ne nhi jeetaya tha world cup",
-        },
-      ],
-    },
-  ];
-
   const { user } = useAuth();
 
+  const [rooms, setRooms] = useState([]);
   const [activeRoom, setActiveRoom] = useState(null);
   const [chatRoomMessages, setChatRoomMessages] = useState([]);
 
   const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/rooms");
+        if (!response.ok) {
+          throw new Error("Failed to fetch rooms");
+        }
+
+        const data = await response.json();
+        console.log(data, "data");
+        setRooms(data);
+      } catch (error) {
+        console.error("Error fetching rooms:", error.message);
+      }
+    };
+
+    fetchRooms();
+  }, []);
 
   useEffect(() => {
     function onMessageReceived({ roomId, message, sender }) {
@@ -57,23 +50,44 @@ export default function Home() {
 
   function sendMessage() {
     if (socket === null) return null;
-
-    console.log(msg, "MSG");
     socket.emit("sendMessage", {
       roomId: activeRoom.id,
       message: msg,
       sender: user.name,
     });
+
+    addMsgToDB();
+  }
+
+  async function addMsgToDB() {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/rooms/${activeRoom.id}/messages`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user._id,
+            message: msg,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      console.log("Message sent successfully");
+    } catch (error) {
+      console.error("Error sending message:", error.message);
+    }
   }
 
   function setRoom(roomId) {
     setActiveRoom(rooms.filter((room) => room.id === roomId)[0]);
-    // console.log(activeRoom.messages, "ROOm");
-    // setChatRoomMessages(activeRoom.messages);
   }
-
-  console.log(activeRoom, "actRoom");
-  console.log(chatRoomMessages, "MESS");
 
   return (
     <div>
@@ -95,13 +109,16 @@ export default function Home() {
 
         <div>
           <div>
-            {chatRoomMessages && (
-              <div>
-                {chatRoomMessages?.map((message) => {
-                  return <div key={message.id}>{message.message}</div>;
-                })}
-              </div>
-            )}
+            {chatRoomMessages &&
+              chatRoomMessages?.map((message) => {
+                return (
+                  <div key={message.id}>
+                    <div>From: {message.sender}</div>
+
+                    <div>{message.message}</div>
+                  </div>
+                );
+              })}
 
             <div>
               <input
