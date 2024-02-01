@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { socket } from "../socket/socket";
 import { useAuth } from "../contexts/authContext";
+import { addMessage, fetchMessages, fetchRooms } from "../services/chatService";
 
 export default function Home() {
   const { user } = useAuth();
@@ -12,21 +13,16 @@ export default function Home() {
   const msg = useRef(null);
 
   useEffect(() => {
-    const fetchRooms = async () => {
+    const fetchRoomsData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/rooms");
-        if (!response.ok) {
-          throw new Error("Failed to fetch rooms");
-        }
-
-        const data = await response.json();
+        const data = await fetchRooms();
         setRooms(data);
       } catch (error) {
-        console.error("Error fetching rooms:", error.message);
+        console.log(error);
       }
     };
 
-    fetchRooms();
+    fetchRoomsData();
   }, []);
 
   useEffect(() => {
@@ -42,23 +38,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const fetchMessages = async () => {
+    const fetchMessagesData = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/rooms/${activeRoom.id}/messages`
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch messages");
+        if (activeRoom) {
+          const data = await fetchMessages(activeRoom.id);
+          setChatRoomMessages(data);
         }
-
-        const data = await response.json();
-        setChatRoomMessages(data);
       } catch (error) {
-        console.error("Error fetching messages:", error.message);
+        console.log(error);
       }
     };
-    fetchMessages();
+
+    fetchMessagesData();
   }, [activeRoom]);
 
   function sendMessage() {
@@ -74,33 +65,17 @@ export default function Home() {
 
   async function addMsgToDB() {
     try {
-      const response = await fetch(
-        `http://localhost:5000/rooms/${activeRoom.id}/messages`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: user._id,
-            message: msg.current.value,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to send message");
+      if (activeRoom) {
+        await addMessage(activeRoom.id, user._id, msg.current.value);
       }
-
-      console.log("Message sent successfully");
     } catch (error) {
-      console.error("Error sending message:", error.message);
+      console.log(error);
     }
   }
 
   function setRoom(roomId) {
     setActiveRoom(rooms.filter((room) => room.id === roomId)[0]);
-    
+
     socket.emit("join", roomId);
   }
 
