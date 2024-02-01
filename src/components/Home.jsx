@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { socket } from "../socket/socket";
 import { useAuth } from "../contexts/authContext";
 
@@ -9,7 +9,7 @@ export default function Home() {
   const [activeRoom, setActiveRoom] = useState(null);
   const [chatRoomMessages, setChatRoomMessages] = useState([]);
 
-  const [msg, setMsg] = useState("");
+  const msg = useRef(null);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -40,7 +40,7 @@ export default function Home() {
     return () => {
       socket.off("messageReceived");
     };
-  }, [socket]);
+  }, []);
 
   useEffect(() => {
     if (activeRoom) {
@@ -52,7 +52,7 @@ export default function Home() {
     if (socket === null) return null;
     socket.emit("sendMessage", {
       roomId: activeRoom.id,
-      message: msg,
+      message: msg.current.value,
       sender: user.name,
     });
 
@@ -70,7 +70,7 @@ export default function Home() {
           },
           body: JSON.stringify({
             userId: user._id,
-            message: msg,
+            message: msg.current.value,
           }),
         }
       );
@@ -90,48 +90,44 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <div>
-        <div>
-          {rooms.map((room) => {
-            return (
-              <div
-                key={room.id}
-                onClick={() => {
-                  setRoom(room.id);
-                }}
-              >
-                <div>{room.title}</div>
+    <div className=" h-screen overflow-hidden grid grid-cols-12">
+      <aside className="col-span-3 py-4 overflow-y-auto">
+        {rooms.map((room) => (
+          <div
+            className="p-2 hover:bg-blue-600 cursor-pointer"
+            key={room.id}
+            onClick={() => {
+              setRoom(room.id);
+            }}
+          >
+            <div>{room.title}</div>
+          </div>
+        ))}
+      </aside>
+
+      <div className="col-span-9 p-4 overflow-y-auto flex flex-col">
+        <div className="flex-grow overflow-y-auto">
+          {chatRoomMessages &&
+            chatRoomMessages?.map((message) => (
+              <div key={message.id} className="mb-4">
+                <div className="font-bold">{message.sender}</div>
+                <div>{message.message}</div>
               </div>
-            );
-          })}
+            ))}
         </div>
 
-        <div>
-          <div>
-            {chatRoomMessages &&
-              chatRoomMessages?.map((message) => {
-                return (
-                  <div key={message.id}>
-                    <div>From: {message.sender}</div>
-
-                    <div>{message.message}</div>
-                  </div>
-                );
-              })}
-
-            <div>
-              <input
-                onChange={(event) => {
-                  console.log(event);
-                  setMsg(event.target.value);
-                }}
-                type="text"
-              />
-
-              <button onClick={sendMessage}>Send</button>
-            </div>
-          </div>
+        <div className="flex items-center space-x-4 py-4">
+          <input
+            ref={msg}
+            type="text"
+            className="p-2 border border-gray-300 rounded"
+          />
+          <button
+            onClick={sendMessage}
+            className="p-2 bg-blue-600 text-white rounded"
+          >
+            Send
+          </button>
         </div>
       </div>
     </div>

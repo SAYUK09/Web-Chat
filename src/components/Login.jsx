@@ -33,6 +33,11 @@ export default function loginWithGoogle() {
 
     const { name, email, uid, photo, _id } = user;
 
+    localStorage.setItem(
+      "auth",
+      JSON.stringify({ name, email, uid, photo, _id })
+    );
+
     setUser({ name, email, uid, photo, _id });
   }
 
