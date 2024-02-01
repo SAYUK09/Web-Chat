@@ -5,6 +5,9 @@ import { addMessage, fetchMessages, fetchRooms } from "../services/chatService";
 import { Dropzone } from "@mantine/dropzone";
 import { Button, Group } from "@mantine/core";
 import { uploadMedia } from "../services/mediaService";
+import AudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
+import ReactPlayer from "react-player";
 
 export default function Home() {
   const { user } = useAuth();
@@ -95,6 +98,8 @@ export default function Home() {
     mediaURL && sendMessage(mediaURL, "video");
   }
 
+  console.log(chatRoomMessages);
+
   return (
     <div className=" h-screen overflow-hidden grid grid-cols-12">
       <aside className="col-span-3 py-4 overflow-y-auto">
@@ -117,12 +122,34 @@ export default function Home() {
       <div className="col-span-9 p-4 overflow-y-auto flex flex-col">
         <div className="flex-grow overflow-y-auto">
           {chatRoomMessages &&
-            chatRoomMessages?.map((message) => (
-              <div key={message.id} className="mb-4">
-                <div className="font-bold">{message.sender}</div>
-                <div>{message.message}</div>
-              </div>
-            ))}
+            chatRoomMessages?.map((message) => {
+              if (message.type === "text") {
+                return (
+                  <div key={message.id} className="mb-4">
+                    <div className="font-bold">{message.sender}</div>
+                    <div>{message.message}</div>
+                  </div>
+                );
+              } else if (message.type === "audio") {
+                return (
+                  <div key={message.id} className="mb-4">
+                    <div className="font-bold">{message.sender}</div>
+
+                    <AudioPlayer
+                      src={message.message}
+                      autoPlayAfterSrcChange={false}
+                    />
+                  </div>
+                );
+              } else if (message.type === "video") {
+                return (
+                  <div key={message.id} className="mb-4">
+                    <div className="font-bold">{message.sender}</div>
+                    <ReactPlayer url={message.message} controls={true} />
+                  </div>
+                );
+              }
+            })}
         </div>
 
         <div className="flex items-center space-x-4 bg-slate-900 p-4">
