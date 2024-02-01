@@ -5,7 +5,6 @@ import {
   Route,
   createRoutesFromElements,
 } from "react-router-dom";
-import "./App.css";
 import { RootLayout } from "./layouts/RootLayout";
 import Login from "./components/Login";
 import Home from "./components/Home";
