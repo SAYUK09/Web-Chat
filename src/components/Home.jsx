@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/authContext";
 import { addMessage, fetchMessages, fetchRooms } from "../services/chatService";
 import { Dropzone } from "@mantine/dropzone";
 import { Button, Group } from "@mantine/core";
+import { uploadMedia } from "../services/mediaService";
 
 export default function Home() {
   const { user } = useAuth();
@@ -85,36 +86,13 @@ export default function Home() {
   }
 
   async function uploadAudio(file) {
-    try {
-      if (!file[0]) {
-        throw new Error("Please select a file.");
-      }
+    const mediaURL = await uploadMedia(file, "webchatAudio", "audio");
+    mediaURL && sendMessage(mediaURL, "audio");
+  }
 
-      const formData = new FormData();
-      formData.append("file", file[0]);
-      formData.append("upload_preset", "webchatAudio");
-
-      const response = await fetch(
-        "https://api.cloudinary.com/v1_1/sayuk/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to upload file. Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const { secure_url: audioUrl } = data;
-      let type = "audio";
-
-      audioUrl && sendMessage(audioUrl, type);
-      console.log(audioUrl);
-    } catch (error) {
-      console.error(error);
-    }
+  async function uploadVideo(file) {
+    const mediaURL = await uploadMedia(file, "webchatVideo", "video");
+    mediaURL && sendMessage(mediaURL, "video");
   }
 
   return (
@@ -169,7 +147,7 @@ export default function Home() {
           <div>
             <Dropzone
               openRef={openRef}
-              onDrop={() => {}}
+              onDrop={uploadVideo}
               activateOnClick={false}
               accept={["video/mp4"]}
             >
