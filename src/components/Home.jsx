@@ -20,7 +20,6 @@ export default function Home() {
         }
 
         const data = await response.json();
-        console.log(data, "data");
         setRooms(data);
       } catch (error) {
         console.error("Error fetching rooms:", error.message);
@@ -43,9 +42,23 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (activeRoom) {
-      setChatRoomMessages(activeRoom.messages);
-    }
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/rooms/${activeRoom.id}/messages`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch messages");
+        }
+
+        const data = await response.json();
+        setChatRoomMessages(data);
+      } catch (error) {
+        console.error("Error fetching messages:", error.message);
+      }
+    };
+    fetchMessages();
   }, [activeRoom]);
 
   function sendMessage() {
@@ -87,6 +100,8 @@ export default function Home() {
 
   function setRoom(roomId) {
     setActiveRoom(rooms.filter((room) => room.id === roomId)[0]);
+    
+    socket.emit("join", roomId);
   }
 
   return (
@@ -94,7 +109,10 @@ export default function Home() {
       <aside className="col-span-3 py-4 overflow-y-auto">
         {rooms.map((room) => (
           <div
-            className="p-2 hover:bg-blue-600 cursor-pointer"
+            className={
+              "p-2 hover:bg-blue-600 cursor-pointer " +
+              (activeRoom?.id === room.id ? "bg-blue-600" : "")
+            }
             key={room.id}
             onClick={() => {
               setRoom(room.id);
