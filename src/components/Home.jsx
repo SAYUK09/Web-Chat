@@ -3,7 +3,7 @@ import { socket } from "../socket/socket";
 import { useAuth } from "../contexts/authContext";
 import { addMessage, fetchMessages, fetchRooms } from "../services/chatService";
 import { Dropzone } from "@mantine/dropzone";
-import { Button, Group } from "@mantine/core";
+import { Button, Group, Box, LoadingOverlay } from "@mantine/core";
 import { uploadMedia } from "../services/mediaService";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
@@ -18,6 +18,9 @@ export default function Home() {
 
   const openRef = useRef(null);
   const msg = useRef(null);
+  const scrollRef = useRef();
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchRoomsData = async () => {
@@ -33,8 +36,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    function onMessageReceived({ roomId, message, sender }) {
-      setChatRoomMessages((msg) => [...msg, { roomId, message, sender }]);
+    function onMessageReceived({ roomId, message, sender, type }) {
+      setChatRoomMessages((msg) => [...msg, { roomId, message, sender, type }]);
+      setLoading(false);
+      scrollRef.current?.scrollIntoView({
+        behavior: "smooth",
+      });
     }
 
     socket.on("messageReceived", onMessageReceived);
@@ -57,6 +64,10 @@ export default function Home() {
     };
 
     fetchMessagesData();
+
+    scrollRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
   }, [activeRoom]);
 
   function sendMessage(message, type) {
@@ -89,11 +100,13 @@ export default function Home() {
   }
 
   async function uploadAudio(file) {
+    setLoading(true);
     const mediaURL = await uploadMedia(file, "webchatAudio", "audio");
     mediaURL && sendMessage(mediaURL, "audio");
   }
 
   async function uploadVideo(file) {
+    setLoading(true);
     const mediaURL = await uploadMedia(file, "webchatVideo", "video");
     mediaURL && sendMessage(mediaURL, "video");
   }
@@ -121,37 +134,44 @@ export default function Home() {
 
       <div className="col-span-9 p-4 overflow-y-auto flex flex-col">
         <div className="flex-grow overflow-y-auto">
-          {chatRoomMessages &&
-            chatRoomMessages?.map((message) => {
-              if (message.type === "text") {
-                return (
-                  <div key={message.id} className="mb-4">
-                    <div className="font-bold">{message.sender}</div>
-                    <div>{message.message}</div>
-                  </div>
-                );
-              } else if (message.type === "audio") {
-                return (
-                  <div key={message.id} className="mb-4">
-                    <div className="font-bold">{message.sender}</div>
+          <Box pos="relative">
+            <LoadingOverlay
+              visible={loading}
+              zIndex={1000}
+              overlayProps={{ radius: "sm", blur: 2 }}
+            />
+            {chatRoomMessages &&
+              chatRoomMessages?.map((message) => {
+                if (message.type === "text") {
+                  return (
+                    <div key={message.id} className="mb-4">
+                      <div className="font-bold">{message.sender}</div>
+                      <div>{message.message}</div>
+                    </div>
+                  );
+                } else if (message.type === "audio") {
+                  return (
+                    <div key={message.id} className="mb-4">
+                      <div className="font-bold">{message.sender}</div>
 
-                    <AudioPlayer
-                      src={message.message}
-                      autoPlayAfterSrcChange={false}
-                    />
-                  </div>
-                );
-              } else if (message.type === "video") {
-                return (
-                  <div key={message.id} className="mb-4">
-                    <div className="font-bold">{message.sender}</div>
-                    <ReactPlayer url={message.message} controls={true} />
-                  </div>
-                );
-              }
-            })}
+                      <AudioPlayer
+                        src={message.message}
+                        autoPlayAfterSrcChange={false}
+                      />
+                    </div>
+                  );
+                } else if (message.type === "video") {
+                  return (
+                    <div key={message.id} className="mb-4">
+                      <div className="font-bold">{message.sender}</div>
+                      <ReactPlayer url={message.message} controls={true} />
+                    </div>
+                  );
+                }
+              })}
+            <div ref={scrollRef}></div>
+          </Box>
         </div>
-
         <div className="flex items-center space-x-4 bg-slate-900 p-4">
           <div>
             <Dropzone
@@ -159,9 +179,11 @@ export default function Home() {
               onDrop={uploadAudio}
               activateOnClick={false}
               accept={["audio/mpeg"]}
+              disabled={loading}
             >
               <Group justify="center">
                 <Button
+                  disabled={loading}
                   onClick={() => openRef.current?.()}
                   style={{ pointerEvents: "all" }}
                 >
@@ -177,9 +199,11 @@ export default function Home() {
               onDrop={uploadVideo}
               activateOnClick={false}
               accept={["video/mp4"]}
+              disabled={loading}
             >
               <Group justify="center">
                 <Button
+                  disabled={loading}
                   onClick={() => openRef.current?.()}
                   style={{ pointerEvents: "all" }}
                 >
@@ -189,12 +213,14 @@ export default function Home() {
             </Dropzone>
           </div>
           <input
+            disabled={loading}
             ref={msg}
             type="text"
             className="p-2 border border-gray-300 rounded flex-grow"
           />
 
           <button
+            disabled={loading}
             onClick={() => {
               sendMessage(msg.current.value, "text");
             }}
