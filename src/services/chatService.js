@@ -28,7 +28,7 @@ const fetchMessages = async (roomId) => {
   }
 };
 
-const addMessage = async (roomId, userId, message) => {
+const addMessage = async (roomId, userId, message, type) => {
   try {
     const response = await fetch(`${BASE_URL}/rooms/${roomId}/messages`, {
       method: "POST",
@@ -38,6 +38,7 @@ const addMessage = async (roomId, userId, message) => {
       body: JSON.stringify({
         userId: userId,
         message: message,
+        type: type,
       }),
     });
 
