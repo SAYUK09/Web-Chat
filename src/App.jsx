@@ -5,7 +5,7 @@ import {
   Route,
   createRoutesFromElements,
 } from "react-router-dom";
-import { RootLayout } from "./layouts/RootLayout";
+import { PrivateRoute, RootLayout } from "./layouts/RootLayout";
 import Login from "./components/Login";
 import Home from "./components/Home";
 
@@ -13,7 +13,7 @@ function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
-        <Route index element={<Home />} />
+        <Route index element={<PrivateRoute element={<Home />} />} />
         <Route path="/login" element={<Login />} />
       </Route>
     )
