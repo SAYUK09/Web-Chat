@@ -2,10 +2,12 @@ import React from "react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
 import { useAuth } from "../contexts/authContext";
-import { Center, Button, Box, Text } from "@mantine/core";
+import { Center, Button, Box } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
 
 export default function loginWithGoogle() {
   const { setUser } = useAuth();
+  const navigate = useNavigate();
 
   console.log(auth);
   function loginWithGoogle() {
@@ -40,6 +42,7 @@ export default function loginWithGoogle() {
     );
 
     setUser({ name, email, uid, photo, _id });
+    navigate("/");
   }
 
   return (

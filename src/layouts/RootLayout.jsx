@@ -1,29 +1,15 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
-import { Navigate, Route } from "react-router-dom";
-import { useAuth } from "../contexts/authContext";
-import { useEffect, useState } from "react";
+import { Outlet, Link, Navigate } from "react-router-dom";
 
 export const PrivateRoute = ({ element }) => {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (user !== null) {
-      setLoading(false);
-    }
-  }, [user]);
-
-  if (loading) {
-    // You can show a loading spinner or any other loading indicator
-    return null;
-  }
+  const localUser = localStorage && localStorage.getItem("auth");
+  const user = JSON.parse(localUser);
 
   if (user && user.uid && user.uid.length) {
     return element;
   }
 
   console.log("Redirecting to /login");
-  return <Navigate to="/login" />;
+  return <Navigate to={"/login"} />;
 };
 
 export const RootLayout = () => {
