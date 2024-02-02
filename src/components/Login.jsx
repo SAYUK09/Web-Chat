@@ -2,6 +2,7 @@ import React from "react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
 import { useAuth } from "../contexts/authContext";
+import { Center, Button } from "@mantine/core";
 
 export default function loginWithGoogle() {
   const { setUser } = useAuth();
@@ -41,5 +42,9 @@ export default function loginWithGoogle() {
     setUser({ name, email, uid, photo, _id });
   }
 
-  return <div onClick={loginWithGoogle}>Login</div>;
+  return (
+    <Center h={"100%"}>
+      <Button onClick={loginWithGoogle}>Login</Button>
+    </Center>
+  );
 }

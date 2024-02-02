@@ -134,7 +134,9 @@ export default function Home() {
 
       <div className="col-span-10 p-4 overflow-y-auto flex flex-col my-4 ">
         <div className=" text-white p-2 mb-2 border rounded-md">
-          <div className=" text-lg font-semibold ">{activeRoom?.title}</div>
+          <div className=" text-lg font-semibold ">
+            {activeRoom ? activeRoom.title : "Select a room"}
+          </div>
 
           <div>{activeRoom?.about}</div>
         </div>
