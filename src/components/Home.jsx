@@ -114,12 +114,12 @@ export default function Home() {
   console.log(chatRoomMessages);
 
   return (
-    <div className=" h-screen overflow-hidden grid grid-cols-12">
-      <aside className="col-span-3 py-4 overflow-y-auto">
+    <div className=" h-screen overflow-hidden grid grid-cols-12 text-white">
+      <aside className="col-span-2 py-4 px-2 overflow-y-auto my-4 border-r-2">
         {rooms.map((room) => (
           <div
             className={
-              "p-2 hover:bg-blue-600 cursor-pointer " +
+              "p-2 hover:bg-blue-600 cursor-pointer my-2" +
               (activeRoom?.id === room.id ? "bg-blue-600" : "")
             }
             key={room.id}
@@ -132,7 +132,13 @@ export default function Home() {
         ))}
       </aside>
 
-      <div className="col-span-9 p-4 overflow-y-auto flex flex-col">
+      <div className="col-span-10 p-4 overflow-y-auto flex flex-col my-4 ">
+        <div className=" text-white p-2 mb-2 border rounded-md">
+          <div className=" text-lg font-semibold ">{activeRoom?.title}</div>
+
+          <div>{activeRoom?.about}</div>
+        </div>
+
         <div className="flex-grow overflow-y-auto">
           <Box pos="relative">
             <LoadingOverlay
@@ -154,10 +160,13 @@ export default function Home() {
                     <div key={message.id} className="mb-4">
                       <div className="font-bold">{message.sender}</div>
 
-                      <AudioPlayer
-                        src={message.message}
-                        autoPlayAfterSrcChange={false}
-                      />
+                      <div className="pr-4">
+                        <AudioPlayer
+                          src={message.message}
+                          autoPlayAfterSrcChange={false}
+                          className="bg-slate-900"
+                        />
+                      </div>
                     </div>
                   );
                 } else if (message.type === "video") {
@@ -172,7 +181,7 @@ export default function Home() {
             <div ref={scrollRef}></div>
           </Box>
         </div>
-        <div className="flex items-center space-x-4 bg-slate-900 p-4">
+        <div className="flex items-center space-x-4 text-white p-4 mt-2 border rounded-md">
           <div>
             <Dropzone
               openRef={openRef}
@@ -187,7 +196,7 @@ export default function Home() {
                   onClick={() => openRef.current?.()}
                   style={{ pointerEvents: "all" }}
                 >
-                  M
+                  Music
                 </Button>
               </Group>
             </Dropzone>
@@ -207,7 +216,7 @@ export default function Home() {
                   onClick={() => openRef.current?.()}
                   style={{ pointerEvents: "all" }}
                 >
-                  V
+                  Video
                 </Button>
               </Group>
             </Dropzone>
