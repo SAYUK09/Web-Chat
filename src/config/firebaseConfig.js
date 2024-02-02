@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API,
+  apiKey: "AIzaSyDhBam6DufY4Qq6UG-kPo2qlRu2emznOTU",
   authDomain: "web-chat-46ca7.firebaseapp.com",
   projectId: "web-chat-46ca7",
   storageBucket: "web-chat-46ca7.appspot.com",
