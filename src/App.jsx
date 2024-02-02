@@ -13,7 +13,14 @@ function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<RootLayout />}>
-        <Route index element={<PrivateRoute element={<Home />} />} />
+        <Route
+          index
+          element={
+            <PrivateRoute redirectTo="/login">
+              <Home />
+            </PrivateRoute>
+          }
+        />
         <Route path="/login" element={<Login />} />
       </Route>
     )

@@ -1,15 +1,11 @@
 import { Outlet, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
 
-export const PrivateRoute = ({ element }) => {
+export const PrivateRoute = ({ children, redirectTo }) => {
   const { user } = useAuth();
+  const isAuthenticated = user?.uid.length;
 
-  if (user && user.uid && user.uid.length) {
-    return element;
-  }
-
-  console.log("Redirecting to /login");
-  return <Navigate to={"/login"} />;
+  return isAuthenticated ? children : <Navigate to={redirectTo} />;
 };
 
 export const RootLayout = () => {
