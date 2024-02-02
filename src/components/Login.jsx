@@ -5,11 +5,10 @@ import { useAuth } from "../contexts/authContext";
 import { Center, Button, Box } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
-export default function loginWithGoogle() {
+export default function Login() {
   const { setUser } = useAuth();
   const navigate = useNavigate();
 
-  console.log(auth);
   function loginWithGoogle() {
     const googleProvider = new GoogleAuthProvider();
 
