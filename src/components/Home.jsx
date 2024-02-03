@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { socket } from "../socket/socket";
 import { fetchRooms } from "../services/chatService";
 import ChatRoom from "./ChatRoom";
+import Welcome from "./Welcome";
 
 export default function Home() {
   const [rooms, setRooms] = useState([]);
@@ -28,7 +29,7 @@ export default function Home() {
 
   return (
     <div className=" h-screen overflow-hidden grid grid-cols-12 text-white">
-      <aside className="bg-dark-primary col-span-2  overflow-y-auto border-r-2">
+      <aside className="bg-dark-primary col-span-2  overflow-y-auto border-r border-solid border-dark-active">
         <div className="p-2 bg-dark-secondary">
           <div className="text-xl p-1 px-2">Select A Room</div>
 
@@ -41,11 +42,14 @@ export default function Home() {
             onClick={() => {
               setRoom(room.id);
             }}
+            className={
+              "hover:bg-slate-700 cursor-pointer " +
+              (activeRoom?.id === room.id ? "bg-dark-active" : "")
+            }
           >
             <div
               className={
-                "border-b border-solid border-dark-active text-lg mx-4 p-4 hover:bg-slate-700 cursor-pointer  " +
-                (activeRoom?.id === room.id ? "bg-dark-active" : "")
+                "border-b border-solid border-dark-active text-lg mx-4 p-4"
               }
             >
               {room.title}
@@ -53,14 +57,9 @@ export default function Home() {
           </div>
         ))}
       </aside>
-
-      {activeRoom ? (
-        <div className="col-span-10 overflow-y-auto">
-          <ChatRoom activeRoom={activeRoom} />
-        </div>
-      ) : (
-        <div>NOT</div>
-      )}
+      <div className="col-span-10 overflow-y-auto">
+        {activeRoom ? <ChatRoom activeRoom={activeRoom} /> : <Welcome />}
+      </div>
     </div>
   );
 }

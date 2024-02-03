@@ -104,7 +104,7 @@ function ChatRoom({ activeRoom }) {
       <div className="px-4 text-white p-2 mb-2 rounded-md">
         <div className=" text-lg font-semibold ">{activeRoom?.title}</div>
 
-        <div>{activeRoom?.about}</div>
+        <div className="text-gray">{activeRoom?.about}</div>
       </div>
 
       <div className="flex-grow px-4 overflow-y-auto bg-chat-background">
