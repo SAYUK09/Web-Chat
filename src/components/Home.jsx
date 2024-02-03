@@ -29,7 +29,12 @@ export default function Home() {
   return (
     <div className=" h-screen overflow-hidden grid grid-cols-12 text-white">
       <aside className="bg-dark-primary col-span-2  overflow-y-auto border-r-2">
-        <div className="p-4 bg-dark-secondary">Select a room</div>
+        <div className="p-2 bg-dark-secondary">
+          <div className="text-xl p-1 px-2">Select A Room</div>
+
+          <p className="px-2 text-gray">Get Chatting!</p>
+        </div>
+
         {rooms.map((room) => (
           <div
             key={room.id}
@@ -39,7 +44,7 @@ export default function Home() {
           >
             <div
               className={
-                "border-b mx-4 p-4 hover:bg-slate-700 cursor-pointer  " +
+                "border-b border-solid border-dark-active text-lg mx-4 p-4 hover:bg-slate-700 cursor-pointer  " +
                 (activeRoom?.id === room.id ? "bg-dark-active" : "")
               }
             >

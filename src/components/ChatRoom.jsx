@@ -19,8 +19,8 @@ function ChatRoom({ activeRoom }) {
   const scrollRef = useRef();
 
   useEffect(() => {
-    function onMessageReceived({ roomId, message, sender, type }) {
-      setChatRoomMessages((msg) => [...msg, { roomId, message, sender, type }]);
+    function onMessageReceived(data) {
+      setChatRoomMessages((msg) => [...msg, { ...data }]);
       setLoading(false);
       scrollRef.current?.scrollIntoView({
         behavior: "smooth",
@@ -88,15 +88,26 @@ function ChatRoom({ activeRoom }) {
     mediaURL && sendMessage(mediaURL, "video");
   }
 
+  const formatedTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const formattedTime = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    }).format(date);
+
+    return formattedTime;
+  };
+
   return (
-    <div className="h-full  flex flex-col bg-dark-secondary">
-      <div className="px-4 text-white p-2 mb-2  rounded-md">
+    <div className="h-full  flex flex-col bg-dark-secondary ">
+      <div className="px-4 text-white p-2 mb-2 rounded-md">
         <div className=" text-lg font-semibold ">{activeRoom?.title}</div>
 
         <div>{activeRoom?.about}</div>
       </div>
 
-      <div className="flex-grow px-4 overflow-y-auto bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-gray-700 via-gray-900 to-black">
+      <div className="flex-grow px-4 overflow-y-auto bg-chat-background">
         <Box pos="relative">
           <LoadingOverlay
             visible={loading}
@@ -105,46 +116,58 @@ function ChatRoom({ activeRoom }) {
           />
           {chatRoomMessages &&
             chatRoomMessages?.map((message) => {
+              const isCurrentUser = message.sender === user.name;
+
               if (message.type === "text") {
                 return (
                   <div
                     key={message.id}
-                    className="m-4 p-4 rounded-lg w-1/5 bg-msg-backround text-balance"
+                    className={`m-4 p-4 py-2 rounded-lg text-balance flex flex-col ${
+                      isCurrentUser
+                        ? "w-1/5 ml-auto  bg-msg-backround "
+                        : "w-1/5 mr-auto bg-incoming-msg-background"
+                    }`}
                   >
                     <div className="font-bold">~ {message.sender}</div>
-                    <div className="">{message.message}</div>
-                  </div>
-                );
-              } else if (message.type === "audio") {
-                return (
-                  <div
-                    key={message.id}
-                    className="m-4 p-4 rounded-lg w-2/5 bg-msg-backround text-balance"
-                  >
-                    <div className="font-bold">~ {message.sender}</div>
-
-                    <div className="pr-4 pt-2 ">
-                      <AudioPlayer
-                        src={message.message}
-                        autoPlayAfterSrcChange={false}
-                        className="bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-gray-700 via-gray-900 to-black"
-                      />
+                    <div className="text-ellipsis hover:text-clip overflow-hidden flex-grow">
+                      {message.message}
+                    </div>
+                    <div className="text-xs text-gray-500 self-end">
+                      {formatedTimestamp(message.timestamp)}
                     </div>
                   </div>
                 );
-              } else if (message.type === "video") {
+              } else if (message.type === "audio" || message.type === "video") {
                 return (
                   <div
                     key={message.id}
-                    className="m-4 p-4 rounded-lg text-balance  w-2/5 bg-msg-backround"
+                    className={`m-4 p-4 py-2 rounded-lg ${
+                      isCurrentUser
+                        ? "w-2/5 ml-auto bg-msg-backround"
+                        : "w-2/5 mr-auto bg-incoming-msg-background"
+                    }  text-balance flex flex-col`}
                   >
                     <div className="font-bold">~ {message.sender}</div>
-
-                    <ReactPlayer
-                      width={"100%"}
-                      url={message.message}
-                      controls={true}
-                    />
+                    <div className="flex-grow">
+                      {message.type === "audio" ? (
+                        <AudioPlayer
+                          src={message.message}
+                          autoPlayAfterSrcChange={false}
+                          className="my-2 rounded-sm"
+                        />
+                      ) : (
+                        <div className="my-2 rounded-sm">
+                          <ReactPlayer
+                            width="100%"
+                            url={message.message}
+                            controls={true}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500 self-end">
+                      {formatedTimestamp(message.timestamp)}
+                    </div>
                   </div>
                 );
               }
