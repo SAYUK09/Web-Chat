@@ -45,15 +45,24 @@ export default function Login() {
   }
 
   return (
-    <Center h={"100%"}>
-      <Box
-        bg={"gray"}
-        className="rounded-md px-10 py-5 flex flex-col items-center justify-center"
-      >
-        <div className="my-4 text-2xl">Login With Google</div>
+    <div className="flex flex-col items-center justify-center h-full ">
+      <div className="bg-dark-secondary rounded-md px-10 py-5 flex flex-col items-center justify-center">
+        <div className="text-4xl text-white py-2 ">
+          Find your chatroom groove
+        </div>
+        <p className="my-2 text-lg">
+          Chat rooms for every mood, explore and connect
+        </p>
 
-        <Button onClick={loginWithGoogle}>Login</Button>
-      </Box>
-    </Center>
+        <button
+          className="bg-msg-backround mt-8 px-4 py-2 text-white text-xl rounded-md"
+          onClick={loginWithGoogle}
+        >
+          Login
+        </button>
+
+        <p className="py-2 text-white">Log in now and start chatting</p>
+      </div>
+    </div>
   );
 }
