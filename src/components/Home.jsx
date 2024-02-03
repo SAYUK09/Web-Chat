@@ -2,12 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { socket } from "../socket/socket";
 import { useAuth } from "../contexts/authContext";
 import { addMessage, fetchMessages, fetchRooms } from "../services/chatService";
-import { Dropzone } from "@mantine/dropzone";
-import { Button, Group, Box, LoadingOverlay } from "@mantine/core";
-import { uploadMedia } from "../services/mediaService";
-import AudioPlayer from "react-h5-audio-player";
-import "react-h5-audio-player/lib/styles.css";
-import ReactPlayer from "react-player";
+import ChatRoom from "./ChatRoom";
 
 export default function Home() {
   const { user } = useAuth();
@@ -99,148 +94,45 @@ export default function Home() {
     }
   }
 
-  async function uploadAudio(file) {
-    setLoading(true);
-    const mediaURL = await uploadMedia(file, "webchatAudio", "audio");
-    mediaURL && sendMessage(mediaURL, "audio");
-  }
-
-  async function uploadVideo(file) {
-    setLoading(true);
-    const mediaURL = await uploadMedia(file, "webchatVideo", "video");
-    mediaURL && sendMessage(mediaURL, "video");
-  }
-
   console.log(chatRoomMessages);
 
   return (
     <div className=" h-screen overflow-hidden grid grid-cols-12 text-white">
-      <aside className="col-span-2 py-4 px-2 overflow-y-auto my-4 border-r-2">
+      <aside className="bg-dark-primary col-span-2  overflow-y-auto border-r-2">
+        <div className="p-4 bg-dark-secondary">Select a room</div>
         {rooms.map((room) => (
           <div
-            className={
-              "p-2 hover:bg-blue-600 cursor-pointer my-2" +
-              (activeRoom?.id === room.id ? "bg-blue-600" : "")
-            }
             key={room.id}
             onClick={() => {
               setRoom(room.id);
             }}
           >
-            <div>{room.title}</div>
+            <div
+              className={
+                "border-b p-4 hover:bg-slate-700 cursor-pointer  " +
+                (activeRoom?.id === room.id ? "bg-dark-active" : "")
+              }
+            >
+              {room.title}
+            </div>
           </div>
         ))}
       </aside>
 
-      <div className="col-span-10 p-4 overflow-y-auto flex flex-col my-4 ">
-        <div className=" text-white p-2 mb-2 border rounded-md">
-          <div className=" text-lg font-semibold ">
-            {activeRoom ? activeRoom.title : "Select a room"}
-          </div>
-
-          <div>{activeRoom?.about}</div>
-        </div>
-
-        <div className="flex-grow overflow-y-auto">
-          <Box pos="relative">
-            <LoadingOverlay
-              visible={loading}
-              zIndex={1000}
-              overlayProps={{ radius: "sm", blur: 2 }}
-            />
-            {chatRoomMessages &&
-              chatRoomMessages?.map((message) => {
-                if (message.type === "text") {
-                  return (
-                    <div key={message.id} className="mb-4">
-                      <div className="font-bold">{message.sender}</div>
-                      <div>{message.message}</div>
-                    </div>
-                  );
-                } else if (message.type === "audio") {
-                  return (
-                    <div key={message.id} className="mb-4">
-                      <div className="font-bold">{message.sender}</div>
-
-                      <div className="pr-4">
-                        <AudioPlayer
-                          src={message.message}
-                          autoPlayAfterSrcChange={false}
-                          className="bg-slate-900"
-                        />
-                      </div>
-                    </div>
-                  );
-                } else if (message.type === "video") {
-                  return (
-                    <div key={message.id} className="mb-4">
-                      <div className="font-bold">{message.sender}</div>
-                      <ReactPlayer url={message.message} controls={true} />
-                    </div>
-                  );
-                }
-              })}
-            <div ref={scrollRef}></div>
-          </Box>
-        </div>
-        <div className="flex items-center space-x-4 text-white p-4 mt-2 border rounded-md">
-          <div>
-            <Dropzone
-              openRef={openRef}
-              onDrop={uploadAudio}
-              activateOnClick={false}
-              accept={["audio/mpeg"]}
-              disabled={loading}
-            >
-              <Group justify="center">
-                <Button
-                  disabled={loading}
-                  onClick={() => openRef.current?.()}
-                  style={{ pointerEvents: "all" }}
-                >
-                  Music
-                </Button>
-              </Group>
-            </Dropzone>
-          </div>
-
-          <div>
-            <Dropzone
-              openRef={openRef}
-              onDrop={uploadVideo}
-              activateOnClick={false}
-              accept={["video/mp4"]}
-              disabled={loading}
-            >
-              <Group justify="center">
-                <Button
-                  disabled={loading}
-                  onClick={() => openRef.current?.()}
-                  style={{ pointerEvents: "all" }}
-                >
-                  Video
-                </Button>
-              </Group>
-            </Dropzone>
-          </div>
-          <input
-            disabled={loading}
-            ref={msg}
-            type="text"
-            className="p-2 border border-gray-300 rounded flex-grow"
+      {activeRoom ? (
+        <div className="col-span-10 overflow-y-auto">
+          <ChatRoom
+            activeRoom={activeRoom}
+            chatRoomMessages={chatRoomMessages}
+            loading={loading}
+            setLoading={setLoading}
+            sendMessage={sendMessage}
+            scrollRef={scrollRef}
           />
-
-          <button
-            disabled={loading}
-            onClick={() => {
-              sendMessage(msg.current.value, "text");
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            Send
-          </button>
         </div>
-      </div>
+      ) : (
+        <div>NOT</div>
+      )}
     </div>
   );
 }

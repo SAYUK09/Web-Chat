@@ -10,8 +10,8 @@ export const PrivateRoute = ({ children, redirectTo }) => {
 
 export const RootLayout = () => {
   return (
-    <main className="flex flex-col h-screen overflow-hidden">
-      <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white p-4">
+    <main className="flex flex-col h-screen overflow-hidden bg-dark-background p-4">
+      {/* <nav className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white p-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="text-2xl font-bold">
             <Link to="/">WEB CHAT</Link>
@@ -29,7 +29,7 @@ export const RootLayout = () => {
             </li>
           </ul>
         </div>
-      </nav>
+      </nav> */}
 
       <Outlet />
     </main>
