@@ -1,21 +1,80 @@
 import { Button, Group, Box, LoadingOverlay } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import ReactPlayer from "react-player";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import { uploadMedia } from "../services/mediaService";
+import { addMessage, fetchMessages } from "../services/chatService";
+import { useAuth } from "../contexts/authContext";
+import { socket } from "../socket/socket";
 
-function ChatRoom({
-  activeRoom,
-  chatRoomMessages,
-  loading,
-  sendMessage,
-  scrollRef,
-  setLoading,
-}) {
+function ChatRoom({ activeRoom }) {
+  const [chatRoomMessages, setChatRoomMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+
   const openRef = useRef(null);
   const msg = useRef(null);
+  const scrollRef = useRef();
+
+  useEffect(() => {
+    function onMessageReceived({ roomId, message, sender, type }) {
+      setChatRoomMessages((msg) => [...msg, { roomId, message, sender, type }]);
+      setLoading(false);
+      scrollRef.current?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+
+    socket.on("messageReceived", onMessageReceived);
+
+    return () => {
+      socket.off("messageReceived");
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchMessagesData = async () => {
+      try {
+        if (activeRoom) {
+          const data = await fetchMessages(activeRoom.id);
+          setChatRoomMessages(data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchMessagesData();
+
+    scrollRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [activeRoom]);
+
+  async function addMsgToDB(message, type) {
+    try {
+      if (activeRoom) {
+        await addMessage(activeRoom.id, user._id, message, type);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function sendMessage(message, type) {
+    if (socket === null) return null;
+
+    socket.emit("sendMessage", {
+      roomId: activeRoom.id,
+      message: message,
+      sender: user.name,
+      type,
+    });
+
+    addMsgToDB(message, type);
+  }
 
   async function uploadAudio(file) {
     setLoading(true);
