@@ -9,6 +9,7 @@ export default {
         "dark-primary": "#111A21",
         "dark-active": "#2a3942",
         "dark-input": "#202c33",
+        "msg-backround": "#075E54",
       },
     },
   },

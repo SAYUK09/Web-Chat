@@ -39,7 +39,7 @@ export default function Home() {
           >
             <div
               className={
-                "border-b p-4 hover:bg-slate-700 cursor-pointer  " +
+                "border-b mx-4 p-4 hover:bg-slate-700 cursor-pointer  " +
                 (activeRoom?.id === room.id ? "bg-dark-active" : "")
               }
             >

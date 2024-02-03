@@ -96,7 +96,7 @@ function ChatRoom({ activeRoom }) {
         <div>{activeRoom?.about}</div>
       </div>
 
-      <div className="flex-grow px-4 overflow-y-auto">
+      <div className="flex-grow px-4 overflow-y-auto bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-gray-700 via-gray-900 to-black">
         <Box pos="relative">
           <LoadingOverlay
             visible={loading}
@@ -107,30 +107,44 @@ function ChatRoom({ activeRoom }) {
             chatRoomMessages?.map((message) => {
               if (message.type === "text") {
                 return (
-                  <div key={message.id} className="mb-4">
-                    <div className="font-bold">{message.sender}</div>
-                    <div>{message.message}</div>
+                  <div
+                    key={message.id}
+                    className="m-4 p-4 rounded-lg w-1/5 bg-msg-backround text-balance"
+                  >
+                    <div className="font-bold">~ {message.sender}</div>
+                    <div className="">{message.message}</div>
                   </div>
                 );
               } else if (message.type === "audio") {
                 return (
-                  <div key={message.id} className="mb-4">
-                    <div className="font-bold">{message.sender}</div>
+                  <div
+                    key={message.id}
+                    className="m-4 p-4 rounded-lg w-2/5 bg-msg-backround text-balance"
+                  >
+                    <div className="font-bold">~ {message.sender}</div>
 
-                    <div className="pr-4">
+                    <div className="pr-4 pt-2 ">
                       <AudioPlayer
                         src={message.message}
                         autoPlayAfterSrcChange={false}
-                        className="bg-slate-900"
+                        className="bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-gray-700 via-gray-900 to-black"
                       />
                     </div>
                   </div>
                 );
               } else if (message.type === "video") {
                 return (
-                  <div key={message.id} className="mb-4">
-                    <div className="font-bold">{message.sender}</div>
-                    <ReactPlayer url={message.message} controls={true} />
+                  <div
+                    key={message.id}
+                    className="m-4 p-4 rounded-lg text-balance  w-2/5 bg-msg-backround"
+                  >
+                    <div className="font-bold">~ {message.sender}</div>
+
+                    <ReactPlayer
+                      width={"100%"}
+                      url={message.message}
+                      controls={true}
+                    />
                   </div>
                 );
               }
@@ -151,7 +165,7 @@ function ChatRoom({ activeRoom }) {
               <Button
                 disabled={loading}
                 onClick={() => openRef.current?.()}
-                style={{ pointerEvents: "all" }}
+                style={{ pointerEvents: "all", background: "#075E54" }}
               >
                 Music
               </Button>
@@ -171,7 +185,7 @@ function ChatRoom({ activeRoom }) {
               <Button
                 disabled={loading}
                 onClick={() => openRef.current?.()}
-                style={{ pointerEvents: "all" }}
+                style={{ pointerEvents: "all", background: "#075E54" }}
               >
                 Video
               </Button>
@@ -190,7 +204,7 @@ function ChatRoom({ activeRoom }) {
           onClick={() => {
             sendMessage(msg.current.value, "text");
           }}
-          className="px-4 py-2 bg-blue-600 text-white rounded"
+          className="px-4 py-2 bg-msg-backround text-white rounded"
         >
           Send
         </button>
