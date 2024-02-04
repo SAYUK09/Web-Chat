@@ -19,6 +19,13 @@ function ChatRoom({ activeRoom }) {
   const scrollRef = useRef();
 
   useEffect(() => {
+    console.log("scolll");
+    scrollRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [chatRoomMessages]);
+
+  useEffect(() => {
     function onMessageReceived(data) {
       setChatRoomMessages((msg) => [...msg, { ...data }]);
       setLoading(false);
@@ -47,10 +54,6 @@ function ChatRoom({ activeRoom }) {
     };
 
     fetchMessagesData();
-
-    scrollRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
   }, [activeRoom]);
 
   async function addMsgToDB(message, type) {
