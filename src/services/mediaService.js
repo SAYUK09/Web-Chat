@@ -1,6 +1,6 @@
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-const uploadMedia = async (file, preset, type) => {
+const uploadMedia = async (file, preset) => {
   try {
     if (!file[0]) {
       throw new Error("Please select a file.");

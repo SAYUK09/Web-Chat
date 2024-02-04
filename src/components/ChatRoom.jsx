@@ -64,6 +64,7 @@ function ChatRoom({ activeRoom }) {
   }
 
   function sendMessage(message, type) {
+    msg.current.value = "";
     if (socket === null) return null;
 
     socket.emit("sendMessage", {
@@ -76,16 +77,10 @@ function ChatRoom({ activeRoom }) {
     addMsgToDB(message, type);
   }
 
-  async function uploadAudio(file) {
+  async function sendMediaMessage(file, preset, type) {
     setLoading(true);
-    const mediaURL = await uploadMedia(file, "webchatAudio", "audio");
-    mediaURL && sendMessage(mediaURL, "audio");
-  }
-
-  async function uploadVideo(file) {
-    setLoading(true);
-    const mediaURL = await uploadMedia(file, "webchatVideo", "video");
-    mediaURL && sendMessage(mediaURL, "video");
+    const mediaURL = await uploadMedia(file, preset);
+    mediaURL && sendMessage(mediaURL, type);
   }
 
   const formatedTimestamp = (timestamp) => {
@@ -179,7 +174,9 @@ function ChatRoom({ activeRoom }) {
         <div>
           <Dropzone
             openRef={openRef}
-            onDrop={uploadAudio}
+            onDrop={(file) => {
+              sendMediaMessage(file, "webchatAudio", "audio");
+            }}
             activateOnClick={false}
             accept={["audio/mpeg"]}
             disabled={loading}
@@ -199,7 +196,9 @@ function ChatRoom({ activeRoom }) {
         <div>
           <Dropzone
             openRef={openRef}
-            onDrop={uploadVideo}
+            onDrop={(file) => {
+              sendMediaMessage(file, "webchatVideo", "video");
+            }}
             activateOnClick={false}
             accept={["video/mp4"]}
             disabled={loading}
@@ -218,6 +217,14 @@ function ChatRoom({ activeRoom }) {
         <input
           disabled={loading}
           ref={msg}
+          onKeyDown={(e) => {
+            console.log(e.key);
+            if (e.key === "Enter") {
+              e.preventDefault();
+              sendMessage(msg.current.value, "text");
+              msg.current.value = "";
+            }
+          }}
           type="text"
           className="p-2 border border-gray-300 rounded flex-grow"
         />

@@ -16,7 +16,7 @@ const fetchRooms = async () => {
 
 const fetchMessages = async (roomId) => {
   try {
-    const response = await fetch(`${BASE_URL}/rooms/${roomId}/messages`);
+    const response = await fetch(`${BASE_URL}/messages/${roomId}`);
     if (!response.ok) {
       throw new Error("Failed to fetch messages");
     }
@@ -30,7 +30,7 @@ const fetchMessages = async (roomId) => {
 
 const addMessage = async (roomId, userId, message, type) => {
   try {
-    const response = await fetch(`${BASE_URL}/rooms/${roomId}/messages`, {
+    const response = await fetch(`${BASE_URL}/messages/${roomId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
