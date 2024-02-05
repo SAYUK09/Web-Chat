@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <div className=" h-screen overflow-hidden grid grid-cols-12 text-white">
       <aside className="bg-dark-primary col-span-2  overflow-y-auto border-r border-solid border-dark-active">
-        <div className="p-2 bg-dark-secondary">
+        <div className="p-2 bg-dark-secondary sticky top-0">
           <div className="text-xl p-1 px-2">Select A Room</div>
 
           <p className="px-2 text-gray">Get Chatting!</p>
